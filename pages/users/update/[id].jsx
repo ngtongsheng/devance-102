@@ -1,99 +1,52 @@
 import Link from "next/link";
 import { useRouter } from "next/router";
 import { useEffect, useState, useCallback } from "react";
+import UserForm from "../../../components/UserForm";
 
 export default function UpdateUser() {
   const { query } = useRouter();
   const { id } = query;
-  const [user, setUser] = useState({});
+
   const [isLoading, setIsLoading] = useState(true);
+  const [user, setUser] = useState({
+    name: "",
+    country: ""
+  });
 
   useEffect(async () => {
+    if (!id) {
+      return;
+    }
+
     const res = await fetch("/api/getUser?_id=" + id);
     setUser(await res.json());
     setIsLoading(false);
   }, [id]);
 
-  const handleChange = useCallback(
-    ({ target }) => {
-      const { name, value } = target;
-      setUser({
-        ...user,
-        [name]: value
-      });
-    },
-    [user]
-  );
-
-  const handleUpdate = useCallback(async () => {
+  const handleSave = useCallback(async (updatedUser) => {
     setIsLoading(true);
 
     await fetch("/api/updateUser/", {
       method: "PUT",
-      body: JSON.stringify(user)
+      body: JSON.stringify({
+        ...updatedUser,
+        _id: id
+      })
     });
 
     setIsLoading(false);
-  }, [user]);
+  }, [id]);
 
   return (
-    <div className="container">
-      <section className="section">
-        <div className="columns">
-          <div className="column is-6">
-            <div className="field">
-              <label htmlFor="" className="label">
-                Name
-              </label>
-              <div className="control">
-                <input
-                  disabled={isLoading}
-                  type="text"
-                  name="name"
-                  className="input"
-                  value={user.name}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <div className="field">
-              <label htmlFor="" className="label">
-                Country
-              </label>
-              <div className="control">
-                <input
-                  disabled={isLoading}
-                  type="text"
-                  name="country"
-                  className="input"
-                  value={user.country}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
-
-            <br />
-
-            <div class="field is-grouped">
-              <div class="control">
-                <button
-                  disabled={isLoading}
-                  className="button is-dark"
-                  onClick={handleUpdate}
-                >
-                  update
-                </button>
-              </div>
-              <div class="control">
-                <Link href="/users">
-                  <button className="button is-default">back</button>
-                </Link>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-    </div>
+    <>
+      {user.name && (
+        <UserForm
+          name={user.name}
+          country={user.country}
+          onSave={handleSave}
+          isLoading={isLoading}
+        />
+      )}
+    </>
   );
 }
