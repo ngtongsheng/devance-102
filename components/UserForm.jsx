@@ -61,6 +61,9 @@ export default function UserForm({
                     </option>
                     <option value="Malaysia">Malaysia</option>
                     <option value="Singapore">Singapore</option>
+                    <option value="Japan">Japan</option>
+                    <option value="Philipines">Philipines</option>
+                    <option value="Indonesia">Indonesia</option>
                   </select>
                 </div>
               </div>
